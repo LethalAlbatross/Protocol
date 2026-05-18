@@ -82,12 +82,12 @@ button{-webkit-appearance:none;cursor:pointer;font-family:'Courier New',monospac
 
 /* Gym summary screen */
 /* Rest timer */
-.rest-countdown{font-size:56px;font-weight:900;color:var(--accent);letter-spacing:-3px;text-align:center;margin:8px 0;line-height:1}
-.rest-breathe{font-size:11px;color:var(--text3);text-align:center;margin-bottom:4px}
-.rest-cue{font-size:11px;color:var(--text4);text-align:center;font-style:italic;margin-bottom:12px}
-.rest-feel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin:10px 0}
-.rest-feel-btn{padding:10px 5px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text3);font-size:9px;letter-spacing:1px}
-.rest-feel-btn.on{border-color:var(--accent);color:var(--accent);background:#1a0e05}
+
+
+
+
+
+
 
 /* Pre-set screen */
 .pre-set-cue{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:12px;border-left:2px solid var(--border2);padding-left:12px}
@@ -243,8 +243,8 @@ button{-webkit-appearance:none;cursor:pointer;font-family:'Courier New',monospac
     <div class="note-title">NOTE · <span id="note-ctx">GENERAL</span></div>
     <textarea class="note-textarea" id="note-ta" placeholder="Feedback, observations, adjustments..."></textarea>
     <div class="note-actions">
-      <button class="note-save" onclick="saveNote()">SAVE</button>
-      <button class="note-cancel" onclick="closeNote()">CANCEL</button>
+      <button type="button" class="note-save" onclick="saveNote()">SAVE</button>
+      <button type="button" class="note-cancel" onclick="closeNote()">CANCEL</button>
     </div>
   </div>
 </div>
@@ -499,6 +499,10 @@ button{-webkit-appearance:none;cursor:pointer;font-family:'Courier New',monospac
   </div>
 
   <div class="panel" id="panel-sleep">
+    <div class="sec-label">Recovery Insights</div>
+    <div class="card" id="sleep-insight-card" style="border-color:#3a2010">
+      <div id="sleep-insight"></div>
+    </div>
     <div class="sec-label">Sleep Trend</div>
     <div id="sleep-period-toggle" style="display:flex;gap:6px;margin-bottom:10px">
       <button type="button" id="sleep-2w-btn" onclick="setSleepPeriod('2w')" style="flex:1;padding:9px;background:var(--bg2);border:1px solid var(--accent);border-radius:3px;color:var(--accent);font-size:10px;letter-spacing:2px;font-weight:700;font-family:'Courier New',monospace;cursor:pointer">2 WEEKS</button>
@@ -524,6 +528,10 @@ button{-webkit-appearance:none;cursor:pointer;font-family:'Courier New',monospac
   <div class="panel" id="panel-food"><div id="food-content"></div></div>
   <div class="panel" id="panel-plan"><div id="plan-content"></div></div>
   <div class="panel" id="panel-saturday"><div id="sat-content"></div></div>
+  <div id="bottom-quote" style="display:none;padding:18px 14px 80px;text-align:center;border-top:1px solid var(--border);margin-top:20px">
+    <div id="bq-text" style="font-size:11px;color:var(--text4);font-style:italic;line-height:1.6"></div>
+    <div id="bq-author" style="font-size:9px;color:var(--text4);letter-spacing:3px;margin-top:6px"></div>
+  </div>
 </div>
 
 <script>
@@ -641,6 +649,12 @@ const PROGRAM={
      cues_w6:["Light","Full stretch","Chase the pump"],cues_w12:["Light. Stretch. Pump."],
      mmc:"Blood flooding the tricep and elbow area. That pump IS the healing.",
      subs:[{name:"Rope Pushdown (light)",pct:0.5,rM:1,desc:"Same rehab goal. Elbows pinned.",cues:["Light","Full extension","Pump"]}]},
+    {id:"rev_curl_mon",name:"Reverse Dumbbell Curls",sets:3,repRange:"15–20",goal:"Wrist extensor strength. Forearm balance. Tennis elbow rehab.",
+    cues_w1:["Overhand grip — knuckles up","Elbows pinned to sides","Full extension at bottom — let wrist drop","Curl ONLY with wrist and forearm","Control the descent — 3 seconds down","LIGHT weight — this is rehab and building"],
+    cues_w6:["Knuckles up","Elbows pinned","Full drop","Control"],
+    cues_w12:["Knuckles. Pinned. Drop. Control."],
+    mmc:"Wrist extensors (top of forearm) contracting. The muscles that are weak with tennis elbow. Every rep is rehab.",
+    subs:[{name:"Cable Reverse Curl",pct:0.5,rM:1,desc:"Constant tension throughout.",cues:["Overhand grip","Full extension at bottom"]},{name:"Barbell Reverse Curl",pct:0.4,rM:1,desc:"Both hands — easier to control.",cues:["Knuckles up","Elbows pinned"]}]},
   ]},
   Tuesday:{label:"CALISTHENICS",type:"calisthenics",cardio:false,exercises:[
     {id:"chinup_tue",name:"Chin-ups",sets:4,repRange:"6–8",goal:"Upper back width, bicep development, grip strength.",
@@ -658,11 +672,11 @@ const PROGRAM={
      cues_w6:["Body straight","Chest to bar","Squeeze"],cues_w12:["Straight. Chest. Squeeze."],
      mmc:"Mid-back and rear delts pulling. Shoulder blades retracting.",
      subs:[{name:"Dumbbell Row",pct:0.4,rM:1,desc:"Knee on bench, single arm.",cues:["Full stretch","Drive elbow to hip","Squeeze"]}]},
-    {id:"dips_tue",name:"Bench Dips (Feet Elevated)",sets:4,repRange:"12–15",goal:"Tricep mass and shoulder stability.",
-     cues_w1:["Hands on bench behind — feet elevated","Lower until elbows at 90°","Elbows track BACK","Back close to bench","Drive to full lockout"],
-     cues_w6:["90° at bottom","Elbows back","Lockout"],cues_w12:["90. Back. Lockout."],
-     mmc:"Triceps driving the movement.",
-     subs:[{name:"Tricep Dips (bars)",pct:0,rM:0.8,desc:"Upright torso targets triceps.",cues:["Upright","Controlled","Full lockout"]}]},
+    {id:"dips_tue",name:"Dips",sets:4,repRange:"8–12",goal:"Tricep mass, chest and shoulder strength. Compound push movement.",
+     cues_w1:["Upright torso for tricep emphasis","Lower until elbows at 90° minimum — go deeper over time","Drive HARD to full lockout at top","Control the descent — 2 seconds down","Squeeze triceps hard at lockout"],
+     cues_w6:["Upright","90° min","Full lockout","Control down"],cues_w12:["Upright. Deep. Lockout."],
+     mmc:"Triceps driving at top. Chest and front delt loading at bottom. Full lockout is non-negotiable.",
+     subs:[{name:"Assisted Dips",pct:0,rM:1.5,desc:"Band assist or assisted machine.",cues:["Full range","Full lockout","Control"]},{name:"Diamond Push-ups",pct:0,rM:2,desc:"Floor alternative — same stimulus.",cues:["Elbows back","Full range"]}]},
     {id:"knee_tue",name:"Hanging Knee Raises",sets:4,repRange:"10–12",goal:"Core strength, hip flexors, grip endurance.",
      cues_w1:["Start from dead hang","Bring knees ALL the way to chest","No swinging — pure hip flexion","Control the descent","Progress to straight leg raises"],
      cues_w6:["Knees to chest","No swing","Control"],cues_w12:["Knees up. No swing."],
@@ -682,6 +696,12 @@ const PROGRAM={
      cues_w6:["Light","Full extension","Pump"],cues_w12:["Light. Pump."],
      mmc:"Blood pooling in tricep and elbow. That's the healing.",
      subs:[{name:"Overhead Extension (light)",pct:0.5,rM:1,desc:"Same rehab goal.",cues:["Full stretch","Pump"]}]},
+    {id:"farmers_tue",name:"Farmer's Carries",sets:3,repRange:"30–40m",goal:"Grip strength, wrist stability, loaded carry endurance.",
+    cues_w1:["Heavy dumbbells or kettlebells — challenging but controlled","Stand tall — shoulders back and DOWN","Grip hard — white knuckle the handles","Walk with purpose — controlled steps","Don't let shoulders roll forward","Wrists NEUTRAL — don't let them collapse"],
+    cues_w6:["Tall","Grip hard","Neutral wrists","Controlled walk"],
+    cues_w12:["Tall. Grip. Neutral. Walk."],
+    mmc:"Entire hand and forearm under constant tension. Grip is your limiting factor — let it be. Shoulders and traps stabilising. This is full-body loaded carry.",
+    subs:[{name:"Suitcase Carry (one side)",pct:0.7,rM:1,desc:"One dumbbell — harder on core and grip.",cues:["Stay upright","Don't lean to loaded side"]},{name:"Plate Pinch Carry",pct:0.4,rM:1,desc:"Pinch two plates together — extreme grip work.",cues:["Pinch with fingers","Walk slow"]}]},
   ]},
   Wednesday:{label:"HEAVY PUSH",type:"heavy",cardio:true,exercises:[
     {id:"bench_wed",name:"Bench Press",sets:4,repRange:"4–6",goal:"Upper body pressing strength. Chest, anterior delt, tricep.",
@@ -708,16 +728,28 @@ const PROGRAM={
     {id:"tri_wed",name:"Overhead Tricep Extension",sets:3,repRange:"30–40",goal:"Elbow rehab.",
      cues_w1:["Light","Full stretch","Chase the pump"],cues_w6:["Light. Pump."],cues_w12:["Light. Pump."],mmc:"",
      subs:[{name:"Rope Pushdowns",pct:0.5,rM:1,desc:"",cues:["Light","Full extension"]}]},
+    {id:"wrist_holds_wed",name:"Wrist Flexion & Extension Holds",sets:3,repRange:"30–45 sec each",goal:"Wrist joint stability. Tendon loading for tennis elbow rehab.",
+    cues_w1:["Sit with forearm resting on knee or bench","Wrist hanging OFF the edge — nothing supporting it","FLEXION: palm up, curl wrist up, hold","EXTENSION: palm down, curl wrist up, hold","Use very light weight or no weight","Slow and controlled — this is therapeutic loading","If sharp pain — reduce load or stop"],
+    cues_w6:["Forearm supported","Wrist off edge","Slow hold","Controlled"],
+    cues_w12:["Supported. Off edge. Slow. Hold."],
+    mmc:"Tendons and small forearm muscles under sustained time-under-tension. This is the protocol that heals tennis elbow — consistent, light, loaded stretching of the extensor and flexor tendons.",
+    subs:[{name:"Resistance Band Wrist Curls",pct:0,rM:1,desc:"Band instead of weight — very gentle.",cues:["Anchor band at foot","Slow curl","Hold at top"]},{name:"Dead Hang",pct:0,rM:1,desc:"Hang from bar — grip and wrist loaded passively.",cues:["Full hang","Relax shoulders","Build time"]}]},
   ]},
   Thursday:{label:"CALISTHENICS",type:"calisthenics",cardio:false,exercises:[
     {id:"chinup_thu",name:"Chin-ups",sets:4,repRange:"6–8",goal:"Upper back and biceps.",cues_w1:["Full hang","Drive elbows down","Slow descent"],cues_w6:["Hang. Drive. Slow."],cues_w12:["Full ROM."],mmc:"",subs:[{name:"Assisted Chin-up",pct:0,rM:1.5,desc:"",cues:["Full hang","Slow"]}]},
     {id:"diamond_thu",name:"Diamond Push-ups",sets:4,repRange:"12–15",goal:"Tricep and chest.",cues_w1:["Elbows back","Full range","Control"],cues_w6:["Elbows. Range."],cues_w12:["Full ROM."],mmc:"",subs:[{name:"Close-Grip Push-up",pct:0,rM:1,desc:"",cues:["Elbows close"]}]},
     {id:"inv_thu",name:"Inverted Rows",sets:4,repRange:"10–12",goal:"Rear delts.",cues_w1:["Body straight","Chest to bar","Squeeze"],cues_w6:["Straight. Chest. Squeeze."],cues_w12:["Chest. Squeeze."],mmc:"",subs:[{name:"Dumbbell Row",pct:0.4,rM:1,desc:"",cues:["Full stretch","Squeeze"]}]},
-    {id:"dips_thu",name:"Bench Dips",sets:4,repRange:"12–15",goal:"Tricep mass.",cues_w1:["90° at bottom","Elbows back","Lockout"],cues_w6:["90. Back. Lockout."],cues_w12:["Full ROM."],mmc:"",subs:[{name:"Tricep Dips",pct:0,rM:0.8,desc:"",cues:["Upright","Controlled"]}]},
+    {id:"dips_thu",name:"Dips",sets:4,repRange:"8–12",goal:"Tricep mass. Second hit of the week.",cues_w1:["Upright torso","90° at bottom — go deeper over time","Full lockout","2 seconds down"],cues_w6:["Upright","Deep","Lockout","Control"],cues_w12:["Deep. Lockout."],mmc:"Triceps driving to lockout. Feel the stretch at the bottom.",subs:[{name:"Assisted Dips",pct:0,rM:1.5,desc:"Band assist.",cues:["Full range","Full lockout"]},{name:"Close-Grip Push-up",pct:0,rM:2,desc:"Floor alternative.",cues:["Elbows back","Full range"]}]},
     {id:"knee_thu",name:"Hanging Knee Raises",sets:4,repRange:"10–12",goal:"Core.",cues_w1:["Knees to chest","No swing","Control"],cues_w6:["Knees up. Control."],cues_w12:["Full ROM."],mmc:"",subs:[{name:"Lying Leg Raises",pct:0,rM:1.5,desc:"",cues:["Back flat"]}]},
     {id:"pistol_thu",name:"Assisted Pistol Squats",sets:4,repRange:"5–6/leg",goal:"Single-leg stability.",cues_w1:["Knee over toes","Sit deep","Heel down"],cues_w6:["Depth. KOT."],cues_w12:["Full depth."],mmc:"",subs:[{name:"Bulgarian Split Squat",pct:0.25,rM:1,desc:"",cues:["KOT","Control"]}]},
     {id:"calf_thu",name:"Standing Calf Raises",sets:4,repRange:"15–20",goal:"Fourth hit.",cues_w1:["Full stretch","Hard squeeze","Slow"],cues_w6:["Stretch. Squeeze."],cues_w12:["Full ROM."],mmc:"",subs:[{name:"Single-Leg",pct:0,rM:0.6,desc:"",cues:["Full stretch"]}]},
     {id:"rope_thu",name:"Rope Pushdowns",sets:3,repRange:"30–40",goal:"Elbow rehab.",cues_w1:["Light","Full extension","Pump"],cues_w6:["Light. Pump."],cues_w12:["Pump."],mmc:"",subs:[{name:"Overhead Extension",pct:0.5,rM:1,desc:"",cues:["Stretch","Pump"]}]},
+    {id:"asym_wrist_thu",name:"Asymmetric Wrist Holds",sets:3,repRange:"20–30 sec per direction",goal:"Radial & ulnar deviation strength. Rotational wrist stability.",
+    cues_w1:["Hold light dumbbell or plate with arm extended or resting","RADIAL DEVIATION: tilt wrist toward thumb side","ULNAR DEVIATION: tilt wrist toward pinky side","ROTATION: slowly pronate and supinate","One direction at a time — hold the end range","This should feel like a deep stretch-burn","VERY light — 2–5kg maximum"],
+    cues_w6:["Light weight","Radial then ulnar","Hold end range","Slow rotation"],
+    cues_w12:["Light. Radial. Ulnar. Rotate. Hold."],
+    mmc:"The four planes of wrist movement — most people only train two. Radial/ulnar deviation and rotation are almost never trained. This builds the connective tissue that protects your elbow and wrist long term.",
+    subs:[{name:"Rice Bucket Training",pct:0,rM:1,desc:"Plunge hand into rice bucket and rotate — all planes simultaneously.",cues:["Full hand buried","Slow rotations","5 min total"]},{name:"Band Radial/Ulnar",pct:0,rM:1,desc:"Band providing resistance in each direction.",cues:["Anchor band","Controlled deviation","Hold end"]}]},
   ]},
   Friday:{label:"HEAVY PULL",type:"heavy",cardio:true,exercises:[
     {id:"wchin_fri",name:"Weighted Chin-ups",sets:4,repRange:"4–6",goal:"Heavy pulling strength. Lat width. Bicep development.",
@@ -750,6 +782,12 @@ const PROGRAM={
     {id:"tri_fri",name:"Overhead Tricep Extension",sets:3,repRange:"30–40",goal:"End of week elbow rehab flush.",
      cues_w1:["Light","Full stretch","Chase the pump"],cues_w6:["Light. Pump."],cues_w12:["Light. Pump."],mmc:"",
      subs:[{name:"Rope Pushdowns",pct:0.5,rM:1,desc:"",cues:["Light","Full extension"]}]},
+    {id:"rev_wrist_fri",name:"Reverse Wrist Curls",sets:3,repRange:"15–20",goal:"Wrist extensor endurance. Week-end rehab flush.",
+    cues_w1:["Forearm resting on bench or knee — palm DOWN","Wrist hanging off edge","Let wrist drop fully — full range down","Curl up slowly — squeeze at top","2 seconds up, 3 seconds down","LIGHT weight — chase the pump, not the weight"],
+    cues_w6:["Palm down","Full drop","Slow","Squeeze top"],
+    cues_w12:["Down. Slow up. Squeeze."],
+    mmc:"Extensor carpi radialis and ulnaris — the muscles above the lateral epicondyle. The exact muscles affected by tennis elbow. End of week — high rep, light, blood flow flush.",
+    subs:[{name:"Cable Reverse Wrist Curl",pct:0.5,rM:1,desc:"Constant tension.",cues:["Palm down","Full extension","Slow"]},{name:"Theraband Extension",pct:0,rM:2,desc:"Band over fingers, extend — very gentle.",cues:["Fingers together","Slow extension","Hold top"]}]},
   ]},
   Saturday:{label:"REST",type:"rest",note:"Light activity + light stretching optional. Walk, swim, mobility — nothing structured.",exercises:[]},
   Sunday:{label:"REST",type:"rest",note:"Light activity + light stretching optional. Walk, swim, mobility — nothing structured.",exercises:[]},
@@ -790,7 +828,6 @@ function isViewReadOnly(){
 
 function openDayView(dateStr){
   viewDate=dateStr;
-  // Parse date for label
   const parts=dateStr.split('-').map(Number);
   const d=new Date(parts[0],parts[1],parts[2]);
   const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -798,9 +835,12 @@ function openDayView(dateStr){
   const label=`${dayNames[d.getDay()]} ${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
   const readOnly=isViewReadOnly();
 
-  // Show banner
+  // Set training day to match viewed date's weekday
+  const viewedDay=DAYS[d.getDay()===0?6:d.getDay()-1];
+  S.day=viewedDay;
+
   const banner=document.getElementById('day-view-banner');
-  if(banner){banner.style.display='flex';}
+  if(banner)banner.style.display='flex';
   const lbl=document.getElementById('day-view-label');
   if(lbl)lbl.textContent=label;
   const mode=document.getElementById('day-view-mode');
@@ -809,27 +849,31 @@ function openDayView(dateStr){
     mode.style.color=readOnly?'#cc4444':'var(--green)';
   }
 
-  // Apply read-only class if needed
   if(readOnly)document.body.classList.add('day-view-readonly');
   else document.body.classList.remove('day-view-readonly');
 
-  // Re-render current panel for this date
-  const activePanel=document.querySelector('.panel.on');
-  if(activePanel){
-    const panelId=activePanel.id.replace('panel-','');
-    showPanel(panelId);
-  }
+  // Navigate to morning tab showing that day's data
+  showPanel('morning');
 }
 
 function exitDayView(){
   viewDate=null;
-  const banner=document.getElementById('day-view-banner');
+  // Restore today's weekday
+  const now=new Date();
+  S.day=DAYS[now.getDay()===0?6:now.getDay()-1];
   document.body.classList.remove('day-view-readonly');
+  const banner=document.getElementById('day-view-banner');
   if(banner)banner.style.display='none';
-  document.body.style.removeProperty('--view-readonly');
   showPanel('home');
 }
-function wday(){const d=new Date().getDay();return DAYS[d===0?6:d-1];}
+function wday(){
+  if(viewDate){
+    const parts=viewDate.split('-').map(Number);
+    const d=new Date(parts[0],parts[1],parts[2]);
+    return DAYS[d.getDay()===0?6:d.getDay()-1];
+  }
+  const d=new Date().getDay();return DAYS[d===0?6:d-1];
+}
 function wkCfg(w){
   const dl=[4,8,12].includes(w);const ph=w<=4?1:w<=8?2:3;
   // For deload weeks, base the weight off the previous week (w-1) then subtract 10
@@ -885,11 +929,9 @@ function buildMorningQueue(){
 
 function startMorning(){
   fQ=buildMorningQueue();
-  // Resume from saved position if available
   if(S.focusIdx>0&&S.focusIdx<fQ.length){fIdx=S.focusIdx;}
   else{fIdx=0;}
-  mobElapsed=S.timers['mob_total']||0;
-  let cum=0;mobExpected=MOB.map(s=>{cum+=s.expectedSec;return cum;});
+  focusContext='morning';
   document.getElementById('focus-screen').classList.add('on');
   document.getElementById('note-fab').style.display='none';
   renderFStep();
@@ -929,10 +971,7 @@ function renderFStep(){
 
   let bot='';
   if(s.timer>0){
-    const el=S.timers[`fm_${s.id}`]||0;const m=Math.floor(el/60),sec=el%60;
-    bot+=`<div class="fs-timer-big" id="fs-tmr">${m}:${sec.toString().padStart(2,'0')}</div>
-    <div class="fs-timer-sub">TARGET: ${s.target}</div>
-    <button class="fs-timer-btn${fRunning?' running':''}" id="fs-tbtn" onclick="toggleFTimer('${s.id}',${s.timer})">${fRunning?'STOP':'START TIMER'}</button>`;
+    bot+=`<div style="text-align:center;font-size:11px;color:var(--accent);letter-spacing:2px;padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;margin-bottom:8px">TARGET: ${s.target}</div>`;
   }
   if(s.tick){
     bot+=`<button class="fs-done-full" onclick="doneFStep('${s.id}','${s.cat}')">DONE ✓</button>`;
@@ -1060,12 +1099,6 @@ function startMobFlow(){
 
 function renderMobStep(s){
   const mobIdx=MOB.findIndex(m=>m.id===s.id);
-  const expectedAtThisPoint=mobExpected[mobIdx]||0;
-  const elapsed=mobElapsed;
-  const ahead=elapsed<expectedAtThisPoint;
-  const diffSecs=Math.abs(elapsed-expectedAtThisPoint);
-  const m2=Math.floor(elapsed/60),s2=elapsed%60;
-  const paceText=diffSecs<10?'On pace':ahead?`${Math.floor(diffSecs/60)}:${(diffSecs%60).toString().padStart(2,'0')} ahead of pace`:`${Math.floor(diffSecs/60)}:${(diffSecs%60).toString().padStart(2,'0')} behind pace`;
 
   document.getElementById('fs-main').innerHTML=`
     <div class="fs-step-num">${s.area} · DRILL ${mobIdx+1} / ${MOB.length}</div>
@@ -1076,43 +1109,12 @@ function renderMobStep(s){
     <div style="margin-top:10px;font-size:10px;color:#2a6a2a;font-style:italic;line-height:1.5">${s.feel}</div>`;
 
   document.getElementById('fs-bot').innerHTML=`
-    <div class="fs-timer-big" id="mob-elapsed">${m2}:${s2.toString().padStart(2,'0')}</div>
-    <div class="fs-timer-sub">TOTAL MOBILITY TIME · TARGET 15:00</div>
-    <div class="fs-timer-pace" id="mob-pace" style="color:${ahead?'#4aaa4a':'var(--accent)'}">${paceText}</div>
-    <button class="fs-timer-btn" id="mob-tbtn" onclick="toggleMobTimer()">START TIMER</button>
-    <button class="fs-done-full" style="margin-top:6px" onclick="doneMobStep('${s.id}')">DONE — NEXT DRILL →</button>
+    <button class="fs-done-full" onclick="doneMobStep('${s.id}')">DONE — NEXT DRILL →</button>
     <button class="fs-note-btn" onclick="openNote('${s.name}')">i  NOTE</button>`;
-
-  if(!mobRunning&&mobIdx===0&&mobElapsed===0){/* manual start only */}
 }
 
-function toggleMobTimer(){
-  if(mobRunning){
-    clearInterval(mobTimer);mobTimer=null;mobRunning=false;
-    S.timers['mob_total']=mobElapsed;save();
-    const btn=document.getElementById('mob-tbtn');if(btn){btn.textContent='RESUME';btn.classList.remove('running');}
-  } else {
-    mobRunning=true;
-    const btn=document.getElementById('mob-tbtn');if(btn){btn.textContent='PAUSE';btn.classList.add('running');}
-    const startAt=Date.now()-mobElapsed*1000;
-    mobTimer=setInterval(()=>{
-      mobElapsed=Math.floor((Date.now()-startAt)/1000);
-      S.timers['mob_total']=mobElapsed;
-      const m=Math.floor(mobElapsed/60),s=mobElapsed%60;
-      const el=document.getElementById('mob-elapsed');if(el)el.textContent=`${m}:${s.toString().padStart(2,'0')}`;
-      // Update pace
-      const mobIdx=MOB.findIndex(m2=>fIdx<fQ.length&&fQ[fIdx]?.id===m2.id);
-      if(mobIdx>=0){
-        const exp=mobExpected[mobIdx]||0;const diff=Math.abs(mobElapsed-exp);
-        const ahead2=mobElapsed<exp;
-        const paceEl=document.getElementById('mob-pace');
-        if(paceEl)paceEl.textContent=diff<10?'On pace':ahead2?`${Math.floor(diff/60)}:${(diff%60).toString().padStart(2,'0')} ahead`:`${Math.floor(diff/60)}:${(diff%60).toString().padStart(2,'0')} behind`;
-      }
-    },1000);
-  }
-}
-
-function stopMobTimer(){if(mobTimer){clearInterval(mobTimer);mobTimer=null;mobRunning=false;}}
+function toggleMobTimer(){/* timers removed */}
+function stopMobTimer(){/* timers removed */}
 
 function doneMobStep(id){
   // Auto-pause timer when moving to next drill
@@ -1137,46 +1139,57 @@ function doneFStep(id,cat){
 function skipFStep(){fIdx++;renderFStep();}
 
 function fStepBack(){
+  if(focusContext==='training'){
+    // In training, "back" goes to previous set or previous exercise
+    if(actSet>0){actSet--;renderSetLog();return;}
+    // Previous exercise
+    const day=PROGRAM[S.day];const idx=day.exercises.findIndex(e=>e.id===actEx?.id);
+    if(idx>0){actEx=day.exercises[idx-1];actSet=actEx.sets-1;renderSetLog();return;}
+    return;
+  }
   if(fIdx>0){fIdx--;renderFStep();}
 }
 
 function fStepForward(){
+  if(focusContext==='training'){
+    // In training, "forward" advances within the exercise/session
+    advSet();return;
+  }
   if(fIdx<fQ.length-1){fIdx++;renderFStep();}
 }
 
 function saveAndExitFocus(){
-  // Save current position so we can resume
   S.focusIdx=fIdx;
   S.focusQueue=fQ.map(s=>s.id);
   save();
   hideFocus();
-  showPanel('morning');
+  // Return to whichever tab launched focus mode
+  if(focusContext==='training')showPanel('train');
+  else showPanel('morning');
+  focusContext='';
 }
 
-function toggleFTimer(id,target){
-  const key=`fm_${id}`;
-  if(fRunning){clearInterval(fTimer);fTimer=null;fRunning=false;
-    const b=document.getElementById('fs-tbtn');if(b){b.textContent='START TIMER';b.classList.remove('running');}return;}
-  fRunning=true;const b=document.getElementById('fs-tbtn');if(b){b.textContent='STOP TIMER';b.classList.add('running');}
-  const start=Date.now()-(S.timers[key]||0)*1000;
-  fTimer=setInterval(()=>{
-    const el=Math.floor((Date.now()-start)/1000);S.timers[key]=el;
-    const m=Math.floor(el/60),s=el%60;const d=document.getElementById('fs-tmr');
-    if(d)d.textContent=`${m}:${s.toString().padStart(2,'0')}`;
-    if(el>=target){clearInterval(fTimer);fTimer=null;fRunning=false;save();}
-  },1000);
-}
+function toggleFTimer(id,target){/* timers removed */}
 
 // ═══════════════════════════
 // TRAINING FLOW
 // ═══════════════════════════
 
-let actEx=null,actSet=0,restIv=null,restSecs=0;
+let actEx=null,actSet=0;
 let curFeel='',curRestFeel='';
 let skipEx=null,skipReason='',skipAlt=null;
+let focusContext=''; // 'morning' or 'training' — tracks where focus mode was opened from
 
 function startEx(exId){
-  const day=PROGRAM[S.day];actEx=day.exercises.find(e=>e.id===exId);actSet=0;
+  const day=PROGRAM[S.day];actEx=day.exercises.find(e=>e.id===exId);
+  // Resume from first incomplete set
+  actSet=0;
+  for(let i=0;i<actEx.sets;i++){
+    if(getLog(S.day,actEx.id,i,'done')){actSet=i+1;}
+    else break;
+  }
+  if(actSet>=actEx.sets)actSet=0; // all done — start over for editing
+  focusContext='training';
   document.getElementById('focus-screen').classList.add('on');document.getElementById('note-fab').style.display='none';
   document.getElementById('fs-phase').textContent='TRAINING';
   renderSetLog();
@@ -1185,30 +1198,62 @@ function startEx(exId){
 function renderSetLog(){
   if(!actEx)return;
   const wc=wkCfg(S.week);const kg=getLog(S.day,actEx.id,actSet,'kg');const reps=getLog(S.day,actEx.id,actSet,'reps');const rpeLog=getLog(S.day,actEx.id,actSet,'rpe');
-  let sug='';
-  if(actEx.id.includes('squat')&&!actEx.id.includes('pistol'))sug=wc.squat+'kg';
-  else if(actEx.id.includes('bench'))sug=wc.bench+'kg';
-  else if(actEx.id.includes('rdl')||actEx.id.includes('bbrow')||actEx.id.includes('wchin'))sug=wc.deadlift+'kg';
-  // 100kg squat warning
+  let sugKg=0;
+  if(actEx.id.includes('squat')&&!actEx.id.includes('pistol'))sugKg=wc.squat;
+  else if(actEx.id.includes('bench'))sugKg=wc.bench;
+  else if(actEx.id.includes('rdl')||actEx.id.includes('bbrow')||actEx.id.includes('wchin'))sugKg=wc.deadlift;
+  const sug=sugKg?sugKg+'kg':'';
+  // Parse rep range and rpe target
+  const repNums=actEx.repRange.match(/(\d+)[\u2013\-](\d+)/);
+  const repLow=repNums?parseInt(repNums[1]):0;
+  const repHigh=repNums?parseInt(repNums[2]):0;
+  const rpeStr=getExRPE(actEx.id);
+  const rpeNums=rpeStr.match(/(\d+)/g);
+  const rpeLow=rpeNums?parseInt(rpeNums[0]):0;
+  const rpeHigh=rpeNums&&rpeNums[1]?parseInt(rpeNums[1]):rpeLow;
   const squat100=(actEx.id.includes('squat')&&!actEx.id.includes('pistol')&&wc.squat>=100);
-  const squatWarn=squat100?'<div style="background:#1a0a0a;border:1px solid #5a2020;border-radius:3px;padding:10px;margin-bottom:10px"><div style="font-size:10px;color:#cc6666;margin-bottom:6px">⚠ 100KG THRESHOLD — Lower back check required before this set.</div><div style="font-size:9px;color:var(--text4);margin-bottom:6px">Type "osteopath confirmed" to unlock:</div><input type="text" id="squat-confirm" placeholder="osteopath confirmed" oninput="checkSquatUnlock()" style="width:100%;background:#0a0a0a;border:1px solid #5a2020;border-radius:3px;color:#cc6666;font-size:10px;padding:6px 8px;font-family:inherit;outline:none"><div id="squat-locked" style="font-size:9px;color:#664444;margin-top:6px;text-align:center;letter-spacing:2px">SET LOCKED UNTIL CONFIRMED</div></div>':'';
-  const rpeTarget=getExRPE(actEx.id);
+  const squatWarn=squat100?'<div style="background:#1a0a0a;border:1px solid #5a2020;border-radius:3px;padding:10px;margin-bottom:10px"><div style="font-size:10px;color:#cc6666;margin-bottom:6px">⚠ 100KG THRESHOLD — Lower back check required.</div><div style="font-size:9px;color:var(--text4);margin-bottom:6px">Type "osteopath confirmed" to unlock:</div><input type="text" id="squat-confirm" placeholder="osteopath confirmed" oninput="checkSquatUnlock()" style="width:100%;background:#0a0a0a;border:1px solid #5a2020;border-radius:3px;color:#cc6666;font-size:10px;padding:6px 8px;font-family:inherit;outline:none"><div id="squat-locked" style="font-size:9px;color:#664444;margin-top:6px;text-align:center;letter-spacing:2px">SET LOCKED</div></div>':'';
   document.getElementById('fs-prog').textContent=`Set ${actSet+1} / ${actEx.sets}`;
   document.getElementById('fs-main').innerHTML=`
     <div class="fs-step-num">LOG SET ${actSet+1} OF ${actEx.sets}</div>
     <div class="fs-title">${actEx.name}</div>
-    <div style="font-size:10px;color:var(--accent);margin-bottom:10px;letter-spacing:1px">${actEx.repRange} reps · RPE target ${rpeTarget}${sug?` · SUGGESTED: ${sug}`:''}</div>
+    <div style="font-size:10px;color:var(--accent);margin-bottom:10px;letter-spacing:1px">${actEx.repRange} reps · RPE target ${rpeStr}${sug?` · SUGGESTED: ${sug}`:''}</div>
     ${squatWarn}
     <div class="set-log-inputs" style="grid-template-columns:1fr 1fr 1fr">
-      <div class="set-log-cell"><div class="set-log-label">KG</div><input type="number" class="set-log-input" id="sl-kg" placeholder="—" value="${kg}" style="font-size:30px"></div>
-      <div class="set-log-cell"><div class="set-log-label">REPS</div><input type="number" class="set-log-input" id="sl-reps" placeholder="—" value="${reps}" style="font-size:30px"></div>
-      <div class="set-log-cell"><div class="set-log-label">RPE</div><input type="number" class="set-log-input" id="sl-rpe" placeholder="—" min="1" max="10" step="0.5" value="${rpeLog}" style="font-size:30px"></div>
+      <div class="set-log-cell" id="sl-kg-cell"><div class="set-log-label">KG</div><input type="number" class="set-log-input" id="sl-kg" placeholder="—" value="${kg}" style="font-size:30px" oninput="colorSetInput('kg',${sugKg},${sugKg})"></div>
+      <div class="set-log-cell" id="sl-reps-cell"><div class="set-log-label">REPS</div><input type="number" class="set-log-input" id="sl-reps" placeholder="—" value="${reps}" style="font-size:30px" oninput="colorSetInput('reps',${repLow},${repHigh})"></div>
+      <div class="set-log-cell" id="sl-rpe-cell"><div class="set-log-label">RPE</div><input type="number" class="set-log-input" id="sl-rpe" placeholder="—" min="1" max="10" step="0.5" value="${rpeLog}" style="font-size:30px" oninput="colorSetInput('rpe',${rpeLow},${rpeHigh})"></div>
     </div>
     <div style="font-size:9px;color:var(--text4);letter-spacing:2px;margin-bottom:6px;margin-top:10px">HOW DID IT FEEL?</div>
     <div class="feel-row">${['Easy','Good','Hard','Max'].map(f=>`<button class="feel-btn" onclick="setFeel('${f}',this)">${f}</button>`).join('')}</div>`;
   document.getElementById('fs-bot').innerHTML=`<button class="fs-done-full" id="log-set-btn" onclick="logSet()" ${squat100?'disabled style="opacity:0.4;cursor:not-allowed"':''}>LOG SET ✓</button>
     <div class="fs-actions" style="margin-top:6px"><button class="fs-skip" style="flex:1" onclick="skipSet()">SKIP SET</button><button class="fs-skip" style="flex:1;margin-left:6px" onclick="openSkipScreen('${actEx.id}')">SKIP EXERCISE</button></div>
     <button class="fs-note-btn" style="margin-top:6px" onclick="openNote('${actEx.name} Set ${actSet+1}')">i  NOTE</button>`;
+  // Apply initial colors
+  if(kg)colorSetInput('kg',sugKg,sugKg);
+  if(reps)colorSetInput('reps',repLow,repHigh);
+  if(rpeLog)colorSetInput('rpe',rpeLow,rpeHigh);
+}
+
+function colorSetInput(field,lo,hi){
+  const input=document.getElementById('sl-'+field);
+  const cell=document.getElementById('sl-'+field+'-cell');
+  if(!input||!cell)return;
+  const v=parseFloat(input.value);
+  if(isNaN(v)){cell.style.borderColor='var(--border)';input.style.color='var(--white)';return;}
+  // For kg, hi is target — only one value
+  if(field==='kg'){
+    if(lo===0){cell.style.borderColor='var(--border)';input.style.color='var(--white)';return;}
+    if(v<lo*0.95){cell.style.borderColor='#5a2020';input.style.color='#cc4444';}
+    else if(v<lo){cell.style.borderColor='#5a3010';input.style.color='#cc8a30';}
+    else if(v<=lo*1.025){cell.style.borderColor='#1e4a1e';input.style.color='#5aaa5a';}
+    else{cell.style.borderColor='#a08020';input.style.color='#c8a020';}
+    return;
+  }
+  // For reps and RPE — range based
+  if(v<lo){cell.style.borderColor='#5a2020';input.style.color='#cc4444';}
+  else if(v<=hi){cell.style.borderColor='#1e4a1e';input.style.color='#5aaa5a';}
+  else{cell.style.borderColor='#a08020';input.style.color='#c8a020';}
 }
 
 function setFeel(f,btn){curFeel=f;document.querySelectorAll('.feel-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
@@ -1223,33 +1268,26 @@ function logSet(){
 function skipSet(){setLV(S.day,actEx.id,actSet,'skipped',true);save();advSet();}
 
 function showRest(){
-  restSecs=90;
-  const cues=['Exhale slowly. Release the effort.','4 in · 4 hold · 4 out. Steady.','Relax jaw. Drop shoulders. Reset.','Breathe from the belly. Heart rate down.','Stay focused. Next set incoming.'];
-  const c=cues[actSet%cues.length];
+  const cues=getCues(actEx,S.week);
+  const breathCue='Slow breath in through nose · slow breath out through mouth';
   document.getElementById('fs-prog').textContent=`Rest — Set ${actSet+1} done`;
   document.getElementById('fs-main').innerHTML=`<div style="text-align:center">
-    <div style="font-size:9px;color:var(--text4);letter-spacing:3px;margin-bottom:8px">REST PERIOD</div>
-    <div class="rest-countdown" id="r-cnt">1:30</div>
-    <div class="rest-breathe">BREATHE</div>
-    <div class="rest-cue">${c}</div>
-    <div style="margin-top:14px;font-size:9px;color:var(--text4);letter-spacing:2px">HOW WAS THAT REST?</div>
-    <div class="rest-feel">
-      <button class="rest-feel-btn" onclick="setRF('short',this)">TOO SHORT</button>
-      <button class="rest-feel-btn" onclick="setRF('good',this)">JUST RIGHT</button>
-      <button class="rest-feel-btn" onclick="setRF('long',this)">TOO LONG</button>
+    <div style="font-size:9px;color:var(--text4);letter-spacing:3px;margin-bottom:14px">SET ${actSet+1} LOGGED · RESET</div>
+    <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:-1px;margin-bottom:6px">BREATHE</div>
+    <div style="font-size:11px;color:var(--text2);font-style:italic;margin-bottom:14px">${breathCue}</div>
+    <div style="text-align:left;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:12px;margin-bottom:14px">
+      <div style="font-size:9px;color:var(--text4);letter-spacing:2px;margin-bottom:8px">REMEMBER</div>
+      ${cues.map(c=>`<div class="fs-cue"><span class="fs-cue-dot">→</span>${c}</div>`).join('')}
     </div>
   </div>`;
   document.getElementById('fs-bot').innerHTML=`<button class="fs-done-full" onclick="showPreSet()">NEXT SET →</button>
     <button class="fs-skip" style="width:100%;margin-top:6px" onclick="advEx()">FINISH EXERCISE</button>`;
-  if(restIv)clearInterval(restIv);
-  restIv=setInterval(()=>{restSecs--;const m=Math.floor(restSecs/60),s=restSecs%60;const el=document.getElementById('r-cnt');if(el){el.textContent=`${m}:${s.toString().padStart(2,'0')}`;el.style.color=restSecs<=10?'var(--text3)':'var(--accent)';}if(restSecs<=0)clearInterval(restIv);},1000);
 }
 
-function setRF(f,btn){curRestFeel=f;document.querySelectorAll('.rest-feel-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');setLV(S.day,actEx.id,actSet,'restFeel',f);}
+function setRF(){/* removed */}
 
 function showPreSet(){
-  if(restIv){clearInterval(restIv);restIv=null;}
-  const next=actSet+1;if(next>=actEx.sets){advEx();return;}
+    const next=actSet+1;if(next>=actEx.sets){advEx();return;}
   const cues=getCues(actEx,S.week);const cue=cues[next%cues.length]||cues[0];
   const isLast=next===actEx.sets-1;
   const mot=isLast?"LAST SET. Make it count.":next===0?"FIRST SET. Set the standard.":"Keep the standard. Every rep.";
@@ -1303,7 +1341,7 @@ function calcBestStreak(){
 
 function advSet(){actSet++;if(actSet>=actEx.sets)advEx();else renderSetLog();}
 
-function advEx(){if(restIv){clearInterval(restIv);restIv=null;}hideFocus();renderSession();updateHdr();}
+function advEx(){hideFocus();renderSession();updateHdr();}
 
 function openSkipScreen(exId){
   skipEx=PROGRAM[S.day].exercises.find(e=>e.id===exId);skipReason='';skipAlt=null;
@@ -1353,8 +1391,18 @@ function confirmAlt(){
   save();hideFocus();renderSession();updateHdr();
 }
 function confirmSkip(){
-  const k=`${dlk(S.day)}_skip_${skipEx.id}`;S.skipReasons[k]={reason:skipReason,alt:'none',w:S.week,d:tk(),half:true};
-  for(let i=0;i<skipEx.sets;i++){setLV(S.day,skipEx.id,i,'skipped',true);setLV(S.day,skipEx.id,i,'half',true);}
+  const k=`${dlk(S.day)}_skip_${skipEx.id}`;
+  // Get how many sets were already completed
+  let completedSets=0;
+  for(let i=0;i<skipEx.sets;i++){if(getLog(S.day,skipEx.id,i,'done'))completedSets++;}
+  S.skipReasons[k]={reason:skipReason,alt:'none',w:S.week,d:tk(),completed:completedSets,total:skipEx.sets};
+  // Mark all remaining sets as done (skipped) — exercise registers as complete
+  for(let i=0;i<skipEx.sets;i++){
+    if(!getLog(S.day,skipEx.id,i,'done')){
+      setLV(S.day,skipEx.id,i,'done',true);
+      setLV(S.day,skipEx.id,i,'skipped',true);
+    }
+  }
   save();hideFocus();renderSession();updateHdr();
 }
 
@@ -1402,6 +1450,18 @@ function showPanel(p){
   if(p==='food')renderFood();if(p==='saturday')renderSat();
   if(p==='home')renderHome();if(p==='sleep')renderSleepPanel();
   if(p==='evening')renderEvening();if(p==='morning')updateMorningTab();
+  // Bottom quote on all tabs except home
+  const bq=document.getElementById('bottom-quote');
+  if(bq){
+    if(p==='home'){bq.style.display='none';}
+    else{
+      const daySeed=parseInt(tk().replace(/-/g,''))%MOTS.length;
+      const mot=MOTS[daySeed];
+      document.getElementById('bq-text').textContent='"'+mot.t+'"';
+      document.getElementById('bq-author').textContent='— '+mot.a;
+      bq.style.display='block';
+    }
+  }
   save();
 }
 
@@ -1650,15 +1710,15 @@ function renderMorningPanel(){
 
 function saveMornWeight(){
   const v=document.getElementById('morn-weight')?.value;
+  const inp=document.getElementById('morn-weight');
   const t=tk();
   if(v){
     if(!S.weightLog)S.weightLog={};
     const newW=parseFloat(v);
     S.weightLog[t]=newW;
-    // Auto-tick weight step in morning routine
     if(!S.morning[t])S.morning[t]={};
     S.morning[t]['weight']=true;
-    // Anomaly check — flag if >3kg jump from last logged weight
+    if(inp){inp.style.borderColor='#1e4a1e';inp.style.color='#5aaa5a';}
     const recent=Object.entries(S.weightLog).filter(([d])=>d!==t).sort((a,b)=>b[0].localeCompare(a[0]));
     const flagEl=document.getElementById('weight-flag');
     if(flagEl){
@@ -1667,15 +1727,15 @@ function saveMornWeight(){
         const vals=recent.slice(0,7).map(([,v])=>v).filter(Boolean);
         const avg7=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:lastW;
         const diff=Math.abs(newW-avg7);
-        if(diff>=4.5)flagEl.textContent='⚠ '+diff.toFixed(1)+'kg from 7-day avg ('+avg7.toFixed(1)+'kg). Double check before logging.';
+        if(diff>=4.5)flagEl.textContent='⚠ '+diff.toFixed(1)+'kg from 7-day avg ('+avg7.toFixed(1)+'kg). Double check.';
         else flagEl.textContent='';
       } else flagEl.textContent='';
     }
     save();updateMorningTab();updateHdr();
   } else {
-    // Cleared — untick
     if(S.morning[t])delete S.morning[t]['weight'];
     if(S.weightLog)delete S.weightLog[t];
+    if(inp){inp.style.borderColor='var(--border2)';inp.style.color='var(--white)';}
     save();updateMorningTab();updateHdr();
   }
 }
@@ -1687,15 +1747,22 @@ function saveMornSleep(){
   const hrv=document.getElementById('morn-sl-hrv')?.value||'';
   S.sleep[t]={rating,bpm,hrv};
   if(!S.morning[t])S.morning[t]={};
-  if(rating||rhr)S.morning[t]['sleep_log']=true;
+  if(rating||bpm||hrv)S.morning[t]['sleep_log']=true;
   else delete S.morning[t]['sleep_log'];
   save();
+  // Green border for filled fields
+  const ratingEl=document.getElementById('morn-sl-rating');
+  const bpmEl=document.getElementById('morn-sl-bpm');
+  const hrvEl=document.getElementById('morn-sl-hrv');
+  if(ratingEl){const c=ratingEl.parentElement.parentElement;c.style.borderColor=rating?'#1e4a1e':'var(--border2)';}
+  if(bpmEl){const c=bpmEl.parentElement.parentElement;c.style.borderColor=bpm?'#1e4a1e':'var(--border2)';}
+  if(hrvEl){const c=hrvEl.parentElement.parentElement;c.style.borderColor=hrv?'#1e4a1e':'var(--border2)';}
   const el=document.getElementById('morn-sleep-score-display');
   if(el&&rating){
     const sc=parseInt(rating)||0;
     const col=sc>=85?'var(--green)':sc>=65?'var(--accent)':'var(--red)';
     const label=sc>=85?'EXCELLENT':sc>=65?'GOOD':sc>=50?'FAIR':'NEEDS WORK';
-    const rhrNote=bpm?(parseInt(bpm)<=50?' · BPM low — strong recovery':parseInt(bpm)>=65?' · BPM elevated — monitor load':''):'';    
+    const rhrNote=bpm?(parseInt(bpm)<=50?' · BPM low — strong recovery':parseInt(bpm)>=65?' · BPM elevated — monitor load':''):'';
     el.innerHTML='<div style="font-size:9px;color:'+col+';letter-spacing:2px;font-weight:700;margin-top:4px">'+label+rhrNote+'</div>';
   } else if(el) el.innerHTML='';
   updateMorningTab();updateHdr();
@@ -1782,28 +1849,40 @@ function renderSession(){
     const done=cmpSets(S.day,ex.id,ex.sets);
     const sk=S.skipReasons[dlk(S.day)+'_skip_'+ex.id];
     const rpe=getExRPE(ex);
-    const skipLabel=sk?' · SKIPPED: '+sk.reason:(done>0&&done<ex.sets)?' · '+done+'/'+ex.sets+' done':'';
-    const borderColor=done===ex.sets?'border-color:#1e4a1e;':sk?'border-color:#3a2a0a;':'';
-    const nameColor=done===ex.sets?'#5aaa5a':'var(--white)';
-    const countColor=done===ex.sets?'var(--green)':'var(--accent)';
-    const startBorder=done===ex.sets?'#1e4a1e':'var(--border)';
-    const startColor=done===ex.sets?'#5aaa5a':'var(--text2)';
+    // Count actually completed (non-skipped) sets
+    let actualDone=0;
+    for(let i=0;i<ex.sets;i++){if(getLog(S.day,ex.id,i,'done')&&!getLog(S.day,ex.id,i,'skipped'))actualDone++;}
+    let skipLabel='';
+    if(sk){
+      const completedNum=sk.completed!==undefined?sk.completed:actualDone;
+      skipLabel=' · '+completedNum+'/'+ex.sets+' before skip ('+sk.reason+')';
+    } else if(done>0&&done<ex.sets){
+      skipLabel=' · '+done+'/'+ex.sets+' done';
+    }
+    const isComplete=done===ex.sets;
+    const borderColor=isComplete?'border-color:#1e4a1e;':sk?'border-color:#3a2a0a;':'';
+    const nameColor=isComplete?'#5aaa5a':'var(--white)';
+    const countColor=isComplete?'var(--green)':'var(--accent)';
+    const startBorder=isComplete?'#1e4a1e':'var(--border)';
+    const startColor=isComplete?'#5aaa5a':'var(--text2)';
+    // Display count: if skipped, show completed/total format
+    const displayCount=sk?(sk.completed!==undefined?sk.completed:actualDone)+'/'+ex.sets:done+'/'+ex.sets;
     html+='<div class="card" style="'+borderColor+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
         '<div style="flex:1">'+
-          '<div style="font-size:13px;font-weight:900;color:'+nameColor+'">'+ex.name+(done===ex.sets?' ✓':'')+'</div>'+
+          '<div style="font-size:13px;font-weight:900;color:'+nameColor+'">'+ex.name+(isComplete?' ✓':'')+'</div>'+
           '<div style="font-size:9px;color:var(--text3);margin-top:2px">'+ex.sets+' sets · '+ex.repRange+' reps · '+
             '<span style="color:var(--accent)">RPE '+rpe+'</span> '+
-            '<button onclick="showRPEModal()" style="background:none;border:1px solid var(--border);border-radius:2px;padding:1px 5px;cursor:pointer;color:var(--text4);font-size:8px;vertical-align:middle;font-family:inherit">?</button>'+
+            '<button type="button" onclick="showRPEModal()" style="background:none;border:1px solid var(--border);border-radius:2px;padding:1px 5px;cursor:pointer;color:var(--text4);font-size:8px;vertical-align:middle;font-family:inherit">?</button>'+
             skipLabel+
           '</div>'+
         '</div>'+
-        '<div style="font-size:16px;font-weight:900;color:'+countColor+'">'+done+'/'+ex.sets+'</div>'+
+        '<div style="font-size:16px;font-weight:900;color:'+countColor+'">'+displayCount+'</div>'+
       '</div>'+
       '<div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:5px">'+
-        '<button style="padding:10px;background:var(--bg3);border:1px solid '+startBorder+';border-radius:3px;color:'+startColor+';font-size:9px;letter-spacing:1px;font-weight:700" onclick="startEx(\''+ex.id+'\')">START SETS</button>'+
-        '<button style="padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text3);font-size:9px;letter-spacing:1px" onclick="openSkipScreen(\''+ex.id+'\')">SKIP</button>'+
-        '<button style="padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text3);font-size:9px;letter-spacing:1px" onclick="openNote(\''+ex.name+'\')">NOTE</button>'+
+        '<button type="button" style="padding:10px;background:var(--bg3);border:1px solid '+startBorder+';border-radius:3px;color:'+startColor+';font-size:9px;letter-spacing:1px;font-weight:700;cursor:pointer;font-family:inherit" onclick="startEx(\''+ex.id+'\')">'+(isComplete?'REVIEW':done>0?'CONTINUE':'START SETS')+'</button>'+
+        '<button type="button" style="padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text3);font-size:9px;letter-spacing:1px;cursor:pointer;font-family:inherit" onclick="openSkipScreen(\''+ex.id+'\')">SKIP</button>'+
+        '<button type="button" style="padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text3);font-size:9px;letter-spacing:1px;cursor:pointer;font-family:inherit" onclick="openNote(\''+ex.name+'\')">NOTE</button>'+
       '</div></div>';
   });
     c.innerHTML=html;
@@ -1909,7 +1988,60 @@ function setSleepPeriod(p){
   renderSleepPanel();
 }
 
+function renderSleepInsights(){
+  const el=document.getElementById('sleep-insight');
+  if(!el)return;
+  // Gather last 14 days
+  const data=[];
+  for(let i=13;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const k=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    const s=S.sleep[k]||{};
+    data.push({rating:parseInt(s.rating)||0,bpm:parseInt(s.bpm)||0,hrv:parseInt(s.hrv)||0});
+  }
+  const validRating=data.filter(d=>d.rating>0);
+  const validBpm=data.filter(d=>d.bpm>0);
+  const validHrv=data.filter(d=>d.hrv>0);
+  if(validRating.length<3&&validBpm.length<3&&validHrv.length<3){
+    el.innerHTML='<div style="font-size:9px;color:var(--accent);letter-spacing:3px;margin-bottom:6px">BUILDING DATA</div><div style="font-size:11px;color:var(--text3);line-height:1.6">Log at least 3 days of sleep data to see insights. Track AutoSleep %, Waking BPM, and Waking HRV in the Morning tab.</div>';
+    return;
+  }
+  const insights=[];
+  // Sleep rating trend
+  if(validRating.length>=3){
+    const avg=Math.round(validRating.reduce((s,d)=>s+d.rating,0)/validRating.length);
+    if(avg>=85)insights.push({c:'#5aaa5a',t:'Sleep rating averaging '+avg+'% — excellent recovery foundation.'});
+    else if(avg>=70)insights.push({c:'var(--accent)',t:'Sleep rating averaging '+avg+'% — solid but room to climb. Aim for 85%+.'});
+    else insights.push({c:'#cc6644',t:'Sleep rating averaging '+avg+'% — prioritise wind-down routine. Screens off 7:30pm.'});
+  }
+  // BPM trend
+  if(validBpm.length>=3){
+    const first=validBpm.slice(0,Math.ceil(validBpm.length/2));
+    const last=validBpm.slice(Math.floor(validBpm.length/2));
+    const avgF=first.reduce((s,d)=>s+d.bpm,0)/first.length;
+    const avgL=last.reduce((s,d)=>s+d.bpm,0)/last.length;
+    const diff=avgL-avgF;
+    if(Math.abs(diff)<1.5)insights.push({c:'var(--text3)',t:'Waking BPM stable around '+Math.round(avgL)+' — CNS in steady state.'});
+    else if(diff<0)insights.push({c:'#5aaa5a',t:'Waking BPM dropping ('+Math.round(avgF)+'→'+Math.round(avgL)+') — recovery improving. Alcohol/nicotine clearing.'});
+    else insights.push({c:'#cc6644',t:'Waking BPM climbing ('+Math.round(avgF)+'→'+Math.round(avgL)+') — monitor training load and stress.'});
+  }
+  // HRV trend
+  if(validHrv.length>=3){
+    const first=validHrv.slice(0,Math.ceil(validHrv.length/2));
+    const last=validHrv.slice(Math.floor(validHrv.length/2));
+    const avgF=first.reduce((s,d)=>s+d.hrv,0)/first.length;
+    const avgL=last.reduce((s,d)=>s+d.hrv,0)/last.length;
+    const diff=avgL-avgF;
+    if(Math.abs(diff)<2)insights.push({c:'var(--text3)',t:'Waking HRV stable around '+Math.round(avgL)+' — autonomic balance steady.'});
+    else if(diff>0)insights.push({c:'#5aaa5a',t:'Waking HRV climbing ('+Math.round(avgF)+'→'+Math.round(avgL)+') — parasympathetic recovery strengthening.'});
+    else insights.push({c:'#cc6644',t:'Waking HRV dropping ('+Math.round(avgF)+'→'+Math.round(avgL)+') — accumulated stress. Consider deload or extra rest.'});
+  }
+  el.innerHTML='<div style="font-size:9px;color:var(--accent);letter-spacing:3px;margin-bottom:8px">14-DAY READOUT</div>'+
+    insights.map(i=>'<div style="font-size:11px;color:'+i.c+';line-height:1.6;margin-bottom:6px">• '+i.t+'</div>').join('');
+}
+
 function renderSleepPanel(){
+  renderSleepInsights();
   const days=sleepPeriod==='2w'?14:30;
   const data=[];
   for(let i=days-1;i>=0;i--){
@@ -1999,30 +2131,30 @@ function renderBpmGraph(days){
   for(let i=days-1;i>=0;i--){
     const d=new Date();d.setDate(d.getDate()-i);
     const k=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-    const rhr=parseInt(S.sleep[k]?.rhr)||0;
-    data.push({date:d,day:d.getDate(),rhr});
+    const bpm=parseInt(S.sleep[k]?.bpm)||0;
+    data.push({date:d,day:d.getDate(),bpm});
   }
 
   const graph=document.getElementById('bpm-graph');
   if(!graph)return;
-  const hasData=data.some(d=>d.rhr>0);
+  const hasData=data.some(d=>d.bpm>0);
   if(!hasData){
-    graph.innerHTML='<div style="text-align:center;padding:30px 20px;color:var(--text4);font-size:11px">No resting HR data yet.<br>Log your BPM in the Morning tab each day.</div>';
+    graph.innerHTML='<div style="text-align:center;padding:30px 20px;color:var(--text4);font-size:11px">No BPM data yet.<br>Log your Waking BPM in the Morning tab each day.</div>';
     document.getElementById('bpm-summary').innerHTML='';
     return;
   }
 
   const w=320,h=160,pad=18;
-  const valid=data.filter(d=>d.rhr>0);
-  const minV=Math.max(30,Math.min(...valid.map(d=>d.rhr))-5);
-  const maxV=Math.min(120,Math.max(...valid.map(d=>d.rhr))+5);
+  const valid=data.filter(d=>d.bpm>0);
+  const minV=Math.max(30,Math.min(...valid.map(d=>d.bpm))-5);
+  const maxV=Math.min(120,Math.max(...valid.map(d=>d.bpm))+5);
   const innerW=w-pad*2,innerH=h-pad*2;
   const stepX=data.length>1?innerW/(data.length-1):0;
 
   const pts=data.map((d,i)=>{
     const x=pad+i*stepX;
-    const y=d.rhr>0?pad+innerH-(((d.rhr-minV)/(maxV-minV))*innerH):null;
-    return{x,y,rhr:d.rhr,day:d.day};
+    const y=d.bpm>0?pad+innerH-(((d.bpm-minV)/(maxV-minV))*innerH):null;
+    return{x,y,rhr:d.bpm,day:d.day};
   });
 
   let path='';let inPath=false;
@@ -2042,7 +2174,7 @@ function renderBpmGraph(days){
 
   const dots=pts.filter(p=>p.y!==null).map(p=>{
     // Lower RHR = better recovery = green
-    const pct=(p.rhr-minV)/(maxV-minV);
+    const pct=(p.bpm-minV)/(maxV-minV);
     const col=pct<=0.33?'#5aaa5a':pct<=0.66?'#e07830':'#cc4444';
     return `<circle cx="${p.x}" cy="${p.y}" r="3" fill="${col}"/>`;
   }).join('');
@@ -2056,8 +2188,8 @@ function renderBpmGraph(days){
   // Trend arrow — is RHR going up or down?
   const first7=valid.slice(0,Math.ceil(valid.length/2));
   const last7=valid.slice(Math.floor(valid.length/2));
-  const avgFirst=first7.length?first7.reduce((s,d)=>s+d.rhr,0)/first7.length:0;
-  const avgLast=last7.length?last7.reduce((s,d)=>s+d.rhr,0)/last7.length:0;
+  const avgFirst=first7.length?first7.reduce((s,d)=>s+d.bpm,0)/first7.length:0;
+  const avgLast=last7.length?last7.reduce((s,d)=>s+d.bpm,0)/last7.length:0;
   const trend=avgFirst>0&&avgLast>0?(avgLast<avgFirst?'↓ TRENDING DOWN — recovery improving':'↑ TRENDING UP — monitor training load'):'';
   const trendCol=avgLast<avgFirst?'var(--green)':'#cc6644';
 
@@ -2068,9 +2200,9 @@ function renderBpmGraph(days){
     ${xLabels}
   </svg>`;
 
-  const avg=Math.round(valid.reduce((s,d)=>s+d.rhr,0)/valid.length);
-  const lo=Math.min(...valid.map(d=>d.rhr));
-  const hi=Math.max(...valid.map(d=>d.rhr));
+  const avg=Math.round(valid.reduce((s,d)=>s+d.bpm,0)/valid.length);
+  const lo=Math.min(...valid.map(d=>d.bpm));
+  const hi=Math.max(...valid.map(d=>d.bpm));
   document.getElementById('bpm-summary').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding-top:10px;border-top:1px solid var(--border)">
       <div style="text-align:center"><div style="font-size:8px;color:var(--text4);letter-spacing:2px;margin-bottom:4px">AVG</div><div style="font-size:22px;font-weight:900;color:var(--white)">${avg}</div></div>
@@ -2311,6 +2443,8 @@ window.setTiredR=setTiredR;window.saveSleep=saveSleep;
 window.saveDailyWin=saveDailyWin;window.toggleTag=toggleTag;
 window.openNote=openNote;window.closeNote=closeNote;window.saveNote=saveNote;
 window.copySat=copySat;window.setLV=setLV;
+window.colorSetInput=colorSetInput;
+window.renderSleepInsights=renderSleepInsights;
 </script>
 </body>
 </html>
