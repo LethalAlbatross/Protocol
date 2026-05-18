@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROTOCOL UPDATER</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0e0e0e;color:#c8c8c8;font-family:'Courier New',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px}
+h1{font-size:13px;letter-spacing:4px;color:#e07830;margin-bottom:6px}
+.sub{font-size:10px;color:#666;letter-spacing:2px;margin-bottom:40px}
+.btn{width:100%;max-width:320px;padding:18px;background:#e07830;border:none;border-radius:4px;color:#000;font-size:12px;font-weight:900;letter-spacing:3px;font-family:'Courier New',monospace;cursor:pointer;margin-bottom:12px}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.btn-sec{background:#141414;border:1px solid #333;color:#888}
+.status{width:100%;max-width:320px;background:#141414;border:1px solid #2a2a2a;border-radius:4px;padding:14px;font-size:10px;line-height:1.8;min-height:60px;color:#888;margin-bottom:12px;display:none}
+.status.show{display:block}
+.ok{color:#4aaa4a}.err{color:#cc4444}.info{color:#e07830}
+textarea{width:100%;max-width:320px;background:#141414;border:1px solid #2a2a2a;border-radius:4px;padding:12px;color:#888;font-size:9px;font-family:'Courier New',monospace;resize:none;height:80px;outline:none;margin-bottom:12px}
+label{font-size:9px;color:#666;letter-spacing:2px;display:block;margin-bottom:6px;width:100%;max-width:320px}
+</style>
+</head>
+<body>
+<h1>PROTOCOL</h1>
+<div class="sub">GITHUB AUTO-UPDATER</div>
+
+<label>PASTE NEW index.html CODE BELOW</label>
+<textarea id="code-input" placeholder="Paste the full contents of index.html here..."></textarea>
+
+<button class="btn" id="push-btn" onclick="pushToGitHub()">PUSH TO GITHUB →</button>
+<button class="btn btn-sec" onclick="document.getElementById('code-input').value='';updateStatus('','')">CLEAR</button>
+
+<div class="status" id="status"></div>
+
+<script>
+const TOKEN = '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';
+const OWNER = 'lethalalbatross';
+const REPO = 'protocol';
+const FILE = 'index.html';
+
+function updateStatus(msg, type) {
+  const el = document.getElementById('status');
+  el.className = 'status show ' + (type || '');
+  el.innerHTML = msg;
+}
+
+async function pushToGitHub() {
+  const code = document.getElementById('code-input').value.trim();
+  if (!code) {
+    updateStatus('⚠ Paste the new index.html code first.', 'err');
+    return;
+  }
+
+  const btn = document.getElementById('push-btn');
+  btn.disabled = true;
+  btn.textContent = 'CONNECTING...';
+
+  try {
+    // Step 1: Get current file SHA
+    updateStatus('1/3 — Fetching current file info...', 'info');
+    const getResp = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`, {
+      headers: {
+        'Authorization': `token ${TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
+    if (!getResp.ok) throw new Error(`GitHub connection failed: ${getResp.status}`);
+    const fileData = await getResp.json();
+    const sha = fileData.sha;
+    updateStatus(`1/3 — Got file SHA ✓<br>2/3 — Encoding new file...`, 'info');
+
+    // Step 2: Base64 encode the new content
+    const encoded = btoa(unescape(encodeURIComponent(code)));
+    updateStatus(`1/3 — Got file SHA ✓<br>2/3 — Encoded ✓<br>3/3 — Pushing to GitHub...`, 'info');
+
+    // Step 3: Push update
+    const pushResp = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: 'Protocol update via auto-updater',
+        content: encoded,
+        sha: sha
+      })
+    });
+
+    if (!pushResp.ok) {
+      const err = await pushResp.json();
+      throw new Error(err.message || pushResp.status);
+    }
+
+    const result = await pushResp.json();
+    const commitSha = result.commit.sha.substring(0, 8);
+    updateStatus(`✓ PUSHED SUCCESSFULLY<br><br>Commit: ${commitSha}<br>Live in ~60 seconds at:<br><a href="https://lethalalbatross.github.io/protocol" style="color:#e07830">lethalalbatross.github.io/protocol</a>`, 'ok');
+    btn.textContent = '✓ DONE';
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = 'PUSH TO GITHUB →';
+    }, 5000);
+
+  } catch (e) {
+    updateStatus(`✗ Error: ${e.message}`, 'err');
+    btn.disabled = false;
+    btn.textContent = 'PUSH TO GITHUB →';
+  }
+}
+</script>
+</body>
+</html>
