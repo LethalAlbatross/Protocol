@@ -876,19 +876,33 @@ function wday(){
 }
 function wkCfg(w){
   const dl=[4,8,12].includes(w);const ph=w<=4?1:w<=8?2:3;
-  // For deload weeks, base the weight off the previous week (w-1) then subtract 10
   const refW=dl?w-1:w;
   const sq=Math.round((75+(refW-1)*2.5)/2.5)*2.5;const bn=sq;const dead=Math.round((95+(refW-1)*2.5)/2.5)*2.5;
-  return{deload:dl,squat:dl?sq-10:sq,bench:dl?bn-10:bn,deadlift:dl?dead-10:dead,repTarget:ph===1?"4–6":ph===2?"3–5":"2–4"};
+  // Cardio protocol by phase
+  let cardioLabel,cardioDesc;
+  if(w<=2){cardioLabel='ZONE 2 · 20 min';cardioDesc='Conversational pace only. Can hold a full sentence. Building aerobic base — no intensity yet.';}
+  else if(w<=4){cardioLabel='ZONE 2 + SURGES · 20 min';cardioDesc='Mostly conversational pace. 2–3 surges of 30–60 sec at a harder effort. Not all-out — just elevated.';}
+  else if(w<=8){cardioLabel='HIIT · 20 min';cardioDesc='4 rounds: 4 min moderate → 1 min hard effort. Hard = 8/10 difficulty. Not absolute max.';}
+  else{cardioLabel='HIIT INTERVALS · 20 min';cardioDesc='6 rounds: 3 min moderate → 1 min hard → 30 sec near-max. True VO2 max stimulus.';}
+  return{deload:dl,squat:dl?sq-10:sq,bench:dl?bn-10:bn,deadlift:dl?dead-10:dead,repTarget:ph===1?"4–6":ph===2?"3–5":"2–4",cardioLabel,cardioDesc};
+}
+
+// Progressive set scheme: 2 sets W1-2, 3 sets W3-4, 4 sets W5+
+// Rehab exercises (sets:3 max) follow same but cap at 3
+function getSets(ex,w){
+  const base=ex.sets; // max sets from program
+  if(w<=2)return Math.min(base,2);
+  if(w<=4)return Math.min(base,3);
+  return base;
 }
 function getCues(ex,w){if(w>=10&&ex.cues_w12)return ex.cues_w12;if(w>=5&&ex.cues_w6)return ex.cues_w6;return ex.cues_w1||[];}
 function dlk(day){return`w${S.week}_${day}`;}
 function getLog(day,id,si,f){return S.logs[dlk(day)]?.[id]?.[si]?.[f]??"";}
 function setLV(day,id,si,f,v){const k=dlk(day);if(!S.logs[k])S.logs[k]={};if(!S.logs[k][id])S.logs[k][id]={};if(!S.logs[k][id][si])S.logs[k][id][si]={};S.logs[k][id][si][f]=v;save();}
 function cmpSets(day,id,total){let c=0;for(let i=0;i<total;i++)if(S.logs[dlk(day)]?.[id]?.[i]?.done)c++;return c;}
-function dayDone(day){const d=PROGRAM[day];if(d.type==="rest")return true;return d.exercises.every(ex=>cmpSets(day,ex.id,ex.sets)===ex.sets);}
+function dayDone(day){const d=PROGRAM[day];if(d.type==="rest")return true;return d.exercises.every(ex=>{const s=getSets(ex,S.week);return cmpSets(day,ex.id,s)>=s;});}
 function wkProg(){return["Monday","Tuesday","Wednesday","Thursday","Friday"].filter(d=>dayDone(d)).length;}
-function dayScore(day){const d=PROGRAM[day];if(d.type==="rest")return 100;const tot=d.exercises.reduce((a,e)=>a+e.sets,0);const done=d.exercises.reduce((a,e)=>a+cmpSets(day,e.id,e.sets),0);return tot===0?0:Math.round((done/tot)*100);}
+function dayScore(day){const d=PROGRAM[day];if(d.type==="rest")return 100;const tot=d.exercises.reduce((a,e)=>a+getSets(e,S.week),0);const done=d.exercises.reduce((a,e)=>a+Math.min(cmpSets(day,e.id,getSets(e,S.week)),getSets(e,S.week)),0);return tot===0?0:Math.round((done/tot)*100);}
 function mornDone(){const t=tk();return MORN.filter(i=>S.morning[t]?.[i.id]).length+MOB.filter(i=>S.mobility[t]?.[i.id]).length;}
 function eveDone(){const t=tk();return EVE.filter(i=>S.evening[t]?.[i.id]).length;}
 function todayPct(){const mP=Math.round((mornDone()/(MORN.length+MOB.length))*40);const tP=Math.round((dayScore(S.day)/100)*40);const eP=Math.round((eveDone()/EVE.length)*20);return mP+tP+eP;}
@@ -1144,7 +1158,7 @@ function fStepBack(){
     if(actSet>0){actSet--;renderSetLog();return;}
     // Previous exercise
     const day=PROGRAM[S.day];const idx=day.exercises.findIndex(e=>e.id===actEx?.id);
-    if(idx>0){actEx=day.exercises[idx-1];actSet=actEx.sets-1;renderSetLog();return;}
+    if(idx>0){actEx=day.exercises[idx-1];actSet=getSets(actEx,S.week)-1;renderSetLog();return;}
     return;
   }
   if(fIdx>0){fIdx--;renderFStep();}
@@ -1184,11 +1198,11 @@ function startEx(exId){
   const day=PROGRAM[S.day];actEx=day.exercises.find(e=>e.id===exId);
   // Resume from first incomplete set
   actSet=0;
-  for(let i=0;i<actEx.sets;i++){
+  for(let i=0;i<getSets(actEx,S.week);i++){
     if(getLog(S.day,actEx.id,i,'done')){actSet=i+1;}
     else break;
   }
-  if(actSet>=actEx.sets)actSet=0; // all done — start over for editing
+  if(actSet>=getSets(actEx,S.week))actSet=0; // all done — start over for editing
   focusContext='training';
   document.getElementById('focus-screen').classList.add('on');document.getElementById('note-fab').style.display='none';
   document.getElementById('fs-phase').textContent='TRAINING';
@@ -1213,9 +1227,9 @@ function renderSetLog(){
   const rpeHigh=rpeNums&&rpeNums[1]?parseInt(rpeNums[1]):rpeLow;
   const squat100=(actEx.id.includes('squat')&&!actEx.id.includes('pistol')&&wc.squat>=100);
   const squatWarn=squat100?'<div style="background:#1a0a0a;border:1px solid #5a2020;border-radius:3px;padding:10px;margin-bottom:10px"><div style="font-size:10px;color:#cc6666;margin-bottom:6px">⚠ 100KG THRESHOLD — Lower back check required.</div><div style="font-size:9px;color:var(--text4);margin-bottom:6px">Type "osteopath confirmed" to unlock:</div><input type="text" id="squat-confirm" placeholder="osteopath confirmed" oninput="checkSquatUnlock()" style="width:100%;background:#0a0a0a;border:1px solid #5a2020;border-radius:3px;color:#cc6666;font-size:10px;padding:6px 8px;font-family:inherit;outline:none"><div id="squat-locked" style="font-size:9px;color:#664444;margin-top:6px;text-align:center;letter-spacing:2px">SET LOCKED</div></div>':'';
-  document.getElementById('fs-prog').textContent=`Set ${actSet+1} / ${actEx.sets}`;
+  document.getElementById('fs-prog').textContent=`Set ${actSet+1} / ${getSets(actEx,S.week)}`;
   document.getElementById('fs-main').innerHTML=`
-    <div class="fs-step-num">LOG SET ${actSet+1} OF ${actEx.sets}</div>
+    <div class="fs-step-num">LOG SET ${actSet+1} OF ${getSets(actEx,S.week)}</div>
     <div class="fs-title">${actEx.name}</div>
     <div style="font-size:10px;color:var(--accent);margin-bottom:10px;letter-spacing:1px">${actEx.repRange} reps · RPE target ${rpeStr}${sug?` · SUGGESTED: ${sug}`:''}</div>
     ${squatWarn}
@@ -1287,11 +1301,11 @@ function showRest(){
 function setRF(){/* removed */}
 
 function showPreSet(){
-    const next=actSet+1;if(next>=actEx.sets){advEx();return;}
+    const next=actSet+1;if(next>=getSets(actEx,S.week)){advEx();return;}
   const cues=getCues(actEx,S.week);const cue=cues[next%cues.length]||cues[0];
-  const isLast=next===actEx.sets-1;
+  const isLast=next===getSets(actEx,S.week)-1;
   const mot=isLast?"LAST SET. Make it count.":next===0?"FIRST SET. Set the standard.":"Keep the standard. Every rep.";
-  document.getElementById('fs-prog').textContent=`Prepare — Set ${next+1} / ${actEx.sets}`;
+  document.getElementById('fs-prog').textContent=`Prepare — Set ${next+1} / ${getSets(actEx,S.week)}`;
   document.getElementById('fs-main').innerHTML=`<div style="font-size:9px;color:var(--text4);letter-spacing:3px;margin-bottom:12px">PREPARE — SET ${next+1}</div>
     <div style="font-size:20px;font-weight:900;color:var(--white);margin-bottom:6px">${actEx.name}</div>
     <div style="font-size:10px;color:var(--accent);margin-bottom:16px;letter-spacing:1px">${actEx.repRange} reps</div>
@@ -1339,7 +1353,7 @@ function calcBestStreak(){
   return best;
 }
 
-function advSet(){actSet++;if(actSet>=actEx.sets)advEx();else renderSetLog();}
+function advSet(){actSet++;if(actSet>=getSets(actEx,S.week))advEx();else renderSetLog();}
 
 function advEx(){hideFocus();renderSession();updateHdr();}
 
@@ -1394,8 +1408,8 @@ function confirmSkip(){
   const k=`${dlk(S.day)}_skip_${skipEx.id}`;
   // Get how many sets were already completed
   let completedSets=0;
-  for(let i=0;i<skipEx.sets;i++){if(getLog(S.day,skipEx.id,i,'done'))completedSets++;}
-  S.skipReasons[k]={reason:skipReason,alt:'none',w:S.week,d:tk(),completed:completedSets,total:skipEx.sets};
+  const skipExSets=getSets(skipEx,S.week);for(let i=0;i<skipExSets;i++){if(getLog(S.day,skipEx.id,i,'done'))completedSets++;}
+  S.skipReasons[k]={reason:skipReason,alt:'none',w:S.week,d:tk(),completed:completedSets,total:skipExSets};
   // Mark all remaining sets as done (skipped) — exercise registers as complete
   for(let i=0;i<skipEx.sets;i++){
     if(!getLog(S.day,skipEx.id,i,'done')){
@@ -1828,7 +1842,7 @@ function renderDaySel(){
 function renderSession(){
   const c=document.getElementById('train-content');const day=PROGRAM[S.day];const wc=wkCfg(S.week);let html='';
   html+=`<div class="card"><div class="card-label">${day.type==='heavy'?'STRENGTH':day.type==='calisthenics'?'CALISTHENICS':'REST'}</div><div class="card-title">${S.day} — ${day.label}</div>`;
-  if(day.cardio)html+=`<div style="margin-top:8px;background:#180e05;border:1px solid #3a2010;border-radius:3px;padding:8px 10px;font-size:10px;color:#886640;letter-spacing:1px"><span style="color:var(--accent);font-weight:700">HIIT BIKE</span> — 20 min · 4×(4 moderate / 1 all-out) · Fasted</div>`;
+  if(day.cardio)html+=`<div style="margin-top:8px;background:#180e05;border:1px solid #3a2010;border-radius:3px;padding:8px 10px"><div style="font-size:9px;font-weight:700;color:var(--accent);letter-spacing:2px;margin-bottom:4px">CARDIO BIKE · ${wc.cardioLabel}</div><div style="font-size:10px;color:#886640;line-height:1.5">${wc.cardioDesc} Fasted.</div></div>`;
   if(day.type==='heavy')html+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-top:8px">${[['SQUAT',wc.squat],['BENCH',wc.bench],['DEAD',wc.deadlift]].map(([l,v])=>`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:8px 6px;text-align:center"><div style="font-size:8px;color:var(--text4);letter-spacing:1px">${l}</div><div style="font-size:16px;font-weight:900;color:var(--accent)">${v}kg</div><div style="font-size:8px;color:var(--text4)">${wc.repTarget}</div></div>`).join('')}</div>`;
 
   // Injury & energy adjustments
@@ -1846,32 +1860,33 @@ function renderSession(){
   const pct=dayScore(S.day);html+=`<div style="margin-top:8px"><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text4);margin-bottom:3px"><span>SESSION</span><span style="color:${pct===100?'var(--green)':'var(--text4)'}">${pct}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div></div></div>`;
   if(day.type==='rest'){html+=`<div style="text-align:center;padding:30px 20px;color:var(--text4)"><div style="font-size:22px;margin-bottom:8px;color:var(--border2)">○</div><div style="font-size:11px;letter-spacing:3px;color:var(--text3)">REST & RECOVER</div><div style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:12px;margin:14px 0;font-size:11px;color:var(--text3);line-height:1.8">${day.note||'Light activity + stretching optional'}</div><div style="font-size:10px;color:var(--text4);line-height:1.8">Evening routine · Hipensteel stretches<br>Wim Hof · AutoSleep tonight · 9:00pm</div></div>`;c.innerHTML=html;return;}
   day.exercises.forEach(ex=>{
-    const done=cmpSets(S.day,ex.id,ex.sets);
+    const exSets=getSets(ex,S.week);
+    const done=cmpSets(S.day,ex.id,exSets);
     const sk=S.skipReasons[dlk(S.day)+'_skip_'+ex.id];
     const rpe=getExRPE(ex);
     // Count actually completed (non-skipped) sets
     let actualDone=0;
-    for(let i=0;i<ex.sets;i++){if(getLog(S.day,ex.id,i,'done')&&!getLog(S.day,ex.id,i,'skipped'))actualDone++;}
+    for(let i=0;i<exSets;i++){if(getLog(S.day,ex.id,i,'done')&&!getLog(S.day,ex.id,i,'skipped'))actualDone++;}
     let skipLabel='';
     if(sk){
       const completedNum=sk.completed!==undefined?sk.completed:actualDone;
-      skipLabel=' · '+completedNum+'/'+ex.sets+' before skip ('+sk.reason+')';
-    } else if(done>0&&done<ex.sets){
-      skipLabel=' · '+done+'/'+ex.sets+' done';
+      skipLabel=' · '+completedNum+'/'+exSets+' before skip ('+sk.reason+')';
+    } else if(done>0&&done<exSets){
+      skipLabel=' · '+done+'/'+exSets+' done';
     }
-    const isComplete=done===ex.sets;
+    const isComplete=done>=exSets;
     const borderColor=isComplete?'border-color:#1e4a1e;':sk?'border-color:#3a2a0a;':'';
     const nameColor=isComplete?'#5aaa5a':'var(--white)';
     const countColor=isComplete?'var(--green)':'var(--accent)';
     const startBorder=isComplete?'#1e4a1e':'var(--border)';
     const startColor=isComplete?'#5aaa5a':'var(--text2)';
     // Display count: if skipped, show completed/total format
-    const displayCount=sk?(sk.completed!==undefined?sk.completed:actualDone)+'/'+ex.sets:done+'/'+ex.sets;
+    const displayCount=sk?(sk.completed!==undefined?sk.completed:actualDone)+'/'+exSets:done+'/'+exSets;
     html+='<div class="card" style="'+borderColor+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
         '<div style="flex:1">'+
           '<div style="font-size:13px;font-weight:900;color:'+nameColor+'">'+ex.name+(isComplete?' ✓':'')+'</div>'+
-          '<div style="font-size:9px;color:var(--text3);margin-top:2px">'+ex.sets+' sets · '+ex.repRange+' reps · '+
+          '<div style="font-size:9px;color:var(--text3);margin-top:2px">'+exSets+(ex.sets>exSets?' sets (building to '+ex.sets+')':' sets')+' · '+ex.repRange+' reps · '+
             '<span style="color:var(--accent)">RPE '+rpe+'</span> '+
             '<button type="button" onclick="showRPEModal()" style="background:none;border:1px solid var(--border);border-radius:2px;padding:1px 5px;cursor:pointer;color:var(--text4);font-size:8px;vertical-align:middle;font-family:inherit">?</button>'+
             skipLabel+
